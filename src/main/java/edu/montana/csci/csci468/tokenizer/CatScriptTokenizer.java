@@ -40,7 +40,32 @@ public class CatScriptTokenizer {
 
     private boolean scanString() {
         // TODO implement string scanning here!
-        return false;
+        if( peek() == '"') {
+            int start = postion;
+            postion++;
+            while(peek() != '"' && !tokenizationEnd()) {
+                if(peek()=='\\') {
+                    postion++;
+                    if(tokenizationEnd()||(peek() != '\'' && peek() != '\"')){
+                        postion--;
+                        return false;
+                    }
+                }
+                if(peek() == '\n') line++;
+                takeChar();
+            }
+            if(tokenizationEnd() && peek() != '\"'){
+                tokenList.addToken(ERROR, "<Unterminated String>", start, postion, line, lineOffset);
+                return true;
+            }
+            takeChar();
+            String val = src.substring(start+1, postion-1);
+            val = val.replace("\\", "");
+            tokenList.addToken(STRING, val, start, postion, line, lineOffset);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private boolean scanIdentifier() {
@@ -78,11 +103,34 @@ public class CatScriptTokenizer {
         // TODO - implement rest of syntax scanning
         //      - implement comments
         int start = postion;
-        if(matchAndConsume('+')) {
+        if (matchAndConsume('+')) {
             tokenList.addToken(PLUS, "+", start, postion, line, lineOffset);
-        } else if(matchAndConsume('-')) {
+        } else if (matchAndConsume('-')) {
             tokenList.addToken(MINUS, "-", start, postion, line, lineOffset);
-        } else if(matchAndConsume('/')) {
+        } else if (matchAndConsume('*')) {
+            tokenList.addToken(STAR, "*", start, postion, line, lineOffset);
+        }else if (matchAndConsume('!')) {
+            if(matchAndConsume('=')){
+                tokenList.addToken(BANG_EQUAL, "!=", start, postion, line, lineOffset);
+            }
+            else{
+                tokenList.addToken(ERROR, "<Unexpected Token: [" + takeChar() + "]>", start, postion, line, lineOffset);
+            }
+        } else if (matchAndConsume('>')) {
+            if(matchAndConsume('=')){
+                tokenList.addToken(GREATER_EQUAL, ">=", start, postion, line, lineOffset);
+            }
+            else{
+                tokenList.addToken(GREATER, ">", start, postion, line, lineOffset);
+            }
+        } else if (matchAndConsume('<')) {
+            if(matchAndConsume('=')){
+                tokenList.addToken(LESS_EQUAL, "<=", start, postion, line, lineOffset);
+            }
+            else{
+                tokenList.addToken(LESS, "<", start, postion, line, lineOffset);
+            }
+        }else if (matchAndConsume('/')) {
             if (matchAndConsume('/')) {
                 while (peek() != '\n' && !tokenizationEnd()) {
                     takeChar();
@@ -90,13 +138,31 @@ public class CatScriptTokenizer {
             } else {
                 tokenList.addToken(SLASH, "-", start, postion, line, lineOffset);
             }
-        } else if(matchAndConsume('=')) {
+        } else if (matchAndConsume('=')) {
             if (matchAndConsume('=')) {
                 tokenList.addToken(EQUAL_EQUAL, "==", start, postion, line, lineOffset);
             } else {
                 tokenList.addToken(EQUAL, "=", start, postion, line, lineOffset);
             }
-        } else {
+        } else if (matchAndConsume('(')){
+            tokenList.addToken(LEFT_PAREN, "(", start, postion, line, lineOffset);
+        } else if (matchAndConsume(')')){
+            tokenList.addToken(RIGHT_PAREN, ")", start, postion, line, lineOffset);
+        } else if (matchAndConsume('[')){
+            tokenList.addToken(LEFT_BRACKET, "[", start, postion, line, lineOffset);
+        } else if (matchAndConsume(']')) {
+            tokenList.addToken(RIGHT_BRACKET, "]", start, postion, line, lineOffset);
+        } else if (matchAndConsume('{')){
+            tokenList.addToken(LEFT_BRACE, "{", start, postion, line, lineOffset);
+        } else if (matchAndConsume('}')) {
+            tokenList.addToken(RIGHT_BRACE, "}", start, postion, line, lineOffset);
+        } else if (matchAndConsume(':')) {
+            tokenList.addToken(COLON, ":", start, postion, line, lineOffset);
+        } else if (matchAndConsume(',')) {
+            tokenList.addToken(COMMA, ",", start, postion, line, lineOffset);
+        } else if (matchAndConsume('.')) {
+            tokenList.addToken(DOT, ".", start, postion, line, lineOffset);
+        }else {
             tokenList.addToken(ERROR, "<Unexpected Token: [" + takeChar() + "]>", start, postion, line, lineOffset);
         }
     }
@@ -107,9 +173,12 @@ public class CatScriptTokenizer {
             char c = peek();
             if (c == ' ' || c == '\r' || c == '\t') {
                 postion++;
+                lineOffset++;
                 continue;
             } else if (c == '\n') {
                 postion++;
+                line++;
+                lineOffset = 0;
                 continue;
             }
             break;
@@ -142,6 +211,7 @@ public class CatScriptTokenizer {
     private char takeChar() {
         char c = src.charAt(postion);
         postion++;
+        lineOffset++;
         return c;
     }
 
