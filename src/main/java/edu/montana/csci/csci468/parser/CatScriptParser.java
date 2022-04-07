@@ -266,14 +266,16 @@ public class CatScriptParser {
             if(tokens.match(LEFT_PAREN)) {
                 tokens.consumeToken();
                 ArrayList<Expression> exps = new ArrayList<>();
-                exps.add(parseExpression());
+                if(!tokens.match(RIGHT_PAREN)) {
+                    exps.add(parseExpression());
+                }
                 while(tokens.match(COMMA)) {
                     tokens.consumeToken();
                     exps.add(parseExpression());
                 }
                 FunctionCallStatement functionCallStatement = new FunctionCallStatement(new FunctionCallExpression(func.getStringValue(),exps));
                 functionCallStatement.setStart(func);
-                require(LEFT_PAREN, functionCallStatement);
+                require(RIGHT_PAREN, functionCallStatement);
                 functionCallStatement.setEnd(tokens.lastToken());
                 return functionCallStatement;
             }
