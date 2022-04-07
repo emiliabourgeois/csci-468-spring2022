@@ -36,6 +36,7 @@ public class CatscriptType {
         return new ListType(type);
     }
 
+
     @Override
     public String toString() {
         return name;
