@@ -1,0 +1,4 @@
+Errors:
+
+- Missing source zip
+- Missing tyler_bourgeois_portfolio.pdf
