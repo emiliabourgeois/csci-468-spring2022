@@ -4,15 +4,33 @@ Please include a zip file of the final repository in this directory.
 
 # Section 2: Teamwork
 
-Describe how your team worked on this capstone project. List each team member’s primary contributions and estimate the percentage of time that was spent by each team member on the project. Identify team members generically as team member 1, team member 2, etc.
-
+For the capstone project, our team seperately used test driven development to develop seperate recursive descent 
 # Section 3: Design pattern
 
-Identify one design pattern that was used in your capstone project and describe exactly where in the code it is located. 
+The Memoization Pattern is used to memoize calls to ```CatScriptType#getListType()```. If we are creating a list we don't want to store the type of each element with the element itself, so when the CatScriptType is shown a list it stores the type as a ListType() in the class instead. This speeds up algorithms on the list because we don't have to check each value's type, instead we used the pattern. So when a list is created it is created with the getListType() call instead.
 
-Highlight the design pattern in yellow. Explain why you used the pattern and didn’t just code directly.
+```Java
+public static CatscriptType getListType(CatscriptType type) {
+        return new ListType(type);
+    }
+```
+
+```Java
+public Class getJavaType() {
+        return javaClass;
+    }
+
+    public static class ListType extends CatscriptType {
+        private final CatscriptType componentType;
+        public ListType(CatscriptType componentType) {
+            super("list<" + componentType.toString() + ">", List.class);
+            this.componentType = componentType;
+        }
+```
 
 # Section 4: Technical writing. Include the technical document that accompanied your capstone project.
+
+
 
 # Section 5: UML. 
 
