@@ -9,48 +9,48 @@ import static org.junit.jupiter.api.Assertions.*;
 public class PartnerTests extends CatscriptTestBase {
 
     @Test
-    //Test left associativity of basic math functions as well as proper order of operations
-    void Math(){
-        assertEquals(167, evaluateExpression("1-5 * 6 + 4 * 7 * 7"));
-        assertEquals(4, evaluateExpression("2 + 2 / 2 + 2 / 2"));
-    }
-    @Test
-    //Here we test print functions encapsulating a function call that passes in an int and has three return statements
-    //including one with an operation. The if else statement is also tested.
-    //Also properly returns an int
-    void FunctionsandStatements() {
-        assertEquals("0\n0\n1\n2\n", executeProgram("function func(x : int) : int { \n" +
-                "    if(x==0) {\n" +
-                "        return 0\n" +
-                "    }\n" +
-                "    else if(x==1) {\n" +
-                "        return 1\n" +
-                "    }\n" +
-                "    return x-1\n" +
+    void objectConcat(){ // verify if objects of different types can be concatenated using + operator.
+        assertEquals("myStringtrue123\n", executeProgram(
+                "function strConcat(x:object, y:object, z:object):string{\n" +
+                "    return (\"\"+x+y+z)\n" +
                 "}\n" +
-                "print(func(0))\n" +
-                "print(func(1))\n" +
-                "print(func(2))\n" +
-                "print(func(3))"
+                "print(strConcat(\"myString\",true, 123))"));
+    }
+
+    @Test
+    void recursiveFunctions(){ // check if recursive function calling is valid in Catscript
+        assertEquals("0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n", executeProgram(
+                "function recurse(start:int, stop:int):int{\n" +
+                        "    if(start == stop){\n" +
+                        "        print(stop)\n" +
+                        "    }\n" +
+                        "    else{\n" +
+                        "        print(start)\n" +
+                        "        recurse(start+1,stop)\n" +
+                        "    }\n" +
+                        "}\n" +
+                        "\n" +
+                        "recurse(0,10)"
         ));
     }
+
     @Test
-    //Tests if the scope of the program is correct.
-    void SymbolTable() {
-        //checks if branches of if/else statements do not conflict in the table
-        Statement st = parseStatement("function func1(x : int){\n" +
-                "    if(x ==0) {\n" +
-                "        var y = 4\n" +
-                "    } \n" +
-                "    else if(not x){\n" +
-                "        var y = 5\n" +
-                "    }\n" +
-                "}");
-        assertNotNull(st);
-        //check if a variable can be redeclared
-        assertEquals(ErrorType.DUPLICATE_NAME,getParseError("var y = true\nvar y = 10"));
-        //check if functions can use the parameters
-        st = parseStatement("function func1(y){var x = 0}\nfunction func2(y){y = 10}");
-        assertNotNull(st);
+    void nestedLoops(){ // nested 3 for loops on top of eachother and check if iterations = list.size ^ (# of for loops)
+        assertEquals("1000\n", executeProgram(   //                         1000 = 10 ^ 3
+                "function nestedLoops(){\n" +
+                        "    var myList : list<int> = [0,1,2,3,4,5,6,7,8,9]\n" +
+                        "    var count : int = 0\n" +
+                        "    for(i in myList){\n" +
+                        "        for(j in myList){\n" +
+                        "            for(k in myList){\n" +
+                        "                count = count + 1\n" +
+                        "            }\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "    print(count)\n" +
+                        "}\n" +
+                        "\n" +
+                        "nestedLoops()"
+        ));
     }
 }

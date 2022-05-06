@@ -44,14 +44,6 @@ public class AdditiveExpression extends Expression {
                 rightHandSide.addError(ErrorType.INCOMPATIBLE_TYPES);
             }
         }
-        if (getType().equals(CatscriptType.STRING)){
-            if (!leftHandSide.getType().equals(CatscriptType.STRING) && !leftHandSide.getType().equals(CatscriptType.INT) && !leftHandSide.getType().equals(CatscriptType.NULL)) {
-                leftHandSide.addError(ErrorType.INCOMPATIBLE_TYPES);
-            }
-            if (!rightHandSide.getType().equals(CatscriptType.STRING) && !rightHandSide.getType().equals(CatscriptType.INT)&& !rightHandSide.getType().equals(CatscriptType.NULL)) {
-                rightHandSide.addError(ErrorType.INCOMPATIBLE_TYPES);
-            }
-        }
         // TODO handle strings
     }
 
@@ -103,12 +95,23 @@ public class AdditiveExpression extends Expression {
 
     @Override
     public void compile(ByteCodeGenerator code) {
-        getLeftHandSide().compile(code);
-        getRightHandSide().compile(code);
-        if (isAdd()) {
-            code.addInstruction(Opcodes.IADD);
-        } else {
-            code.addInstruction(Opcodes.ISUB);
+        if(getType().equals(CatscriptType.STRING)){
+            getLeftHandSide().compile(code);
+            box(code,getLeftHandSide().getType());
+            code.addMethodInstruction(Opcodes.INVOKESTATIC, ByteCodeGenerator.internalNameFor(String.class), "valueOf", "(Ljava/lang/Object;)Ljava/lang/String;");
+            getRightHandSide().compile(code);
+            box(code,getRightHandSide().getType());
+            code.addMethodInstruction(Opcodes.INVOKESTATIC, ByteCodeGenerator.internalNameFor(String.class), "valueOf", "(Ljava/lang/Object;)Ljava/lang/String;");
+            code.addMethodInstruction(Opcodes.INVOKEVIRTUAL, ByteCodeGenerator.internalNameFor(String.class), "concat", "(Ljava/lang/String;)Ljava/lang/String;");
+        }
+        else {
+            getLeftHandSide().compile(code);
+            getRightHandSide().compile(code);
+            if (isAdd()) {
+                code.addInstruction(Opcodes.IADD);
+            } else {
+                code.addInstruction(Opcodes.ISUB);
+            }
         }
     }
 

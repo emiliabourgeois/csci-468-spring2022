@@ -5,8 +5,9 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 public class Scratch {
-
-    int add(int i) {
+    int y;
+    static int add(int i) {
+        System.out.println("hi");
         return i + 13;
     }
 
@@ -15,7 +16,9 @@ public class Scratch {
     }
 
     public static void main(String[] args) {
-        System.out.println("foo");
-        System.out.println("bar");
+        if(1 == 0){
+            System.out.println("hi");
+        }
+        add(2);
     }
 }
